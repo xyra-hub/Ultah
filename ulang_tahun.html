@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Selamat Ulang Tahun!</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: white;
+      text-align: center;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-top: 50px;
+      animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff00cc; }
+      to { text-shadow: 0 0 20px #ffcc00; }
+    }
+
+    img {
+      width: 250px;
+      margin-top: 30px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 1em;
+      background-color: #ff4081;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+  <h1>Selamat Ulang Tahun, Kaylla Amira Djahabi!</h1>
+  <p>Semoga harimu penuh tawa, cinta, dan kejutan manis!</p>
+  <img src="https://i.imgur.com/BZ6wG6K.png" alt="Kue Ulang Tahun">
+  <br>
+  <button onclick="playMusic()">Putar Lagu</button>
+  <audio id="birthdaySong" src="storage/emulated/0/hbd/selamat_ulangtahun.mp3"></audio>
+
+  <script>
+    function playMusic() {
+      document.getElementById("birthdaySong").play();
+    }
+
+    // FIREWORKS EFFECT
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const fireworks = [];
+
+    function Firework() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height;
+      this.targetY = Math.random() * canvas.height / 2;
+      this.speed = 5 + Math.random() * 3;
+      this.radius = 2;
+      this.exploded = false;
+      this.particles = [];
+
+      this.update = () => {
+        if (!this.exploded) {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) {
+            this.exploded = true;
+            for (let i = 0; i < 50; i++) {
+              this.particles.push(new Particle(this.x, this.y));
+            }
+          }
+        } else {
+          this.particles.forEach(p => p.update());
+        }
+      };
+
+      this.draw = () => {
+        if (!this.exploded) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+          ctx.fillStyle = "white";
+          ctx.fill();
+        } else {
+          this.particles.forEach(p => p.draw());
+        }
+      };
+    }
+
+    function Particle(x, y) {
+      this.x = x;
+      this.y = y;
+      this.speedX = (Math.random() - 0.5) * 5;
+      this.speedY = (Math.random() - 0.5) * 5;
+      this.life = 100;
+
+      this.update = () => {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life -= 2;
+      };
+
+      this.draw = () => {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, ${this.life / 100})`;
+        ctx.fill();
+      };
+    }
+
+    function animate() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (Math.random() < 0.05) {
+        fireworks.push(new Firework());
+      }
+      fireworks.forEach(f => {
+        f.update();
+        f.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
